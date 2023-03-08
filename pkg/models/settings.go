@@ -18,6 +18,7 @@ const (
 	AuthenticationMethodDigestAuth   = "digestAuth"
 	AuthenticationMethodOAuth        = "oauth2"
 	AuthenticationMethodAWS          = "aws"
+  AuthenticationMethodAzure        = "azure"
 )
 
 const (

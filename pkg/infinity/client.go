@@ -84,6 +84,7 @@ func NewClient(settings models.InfinitySettings) (client *Client, err error) {
 	httpClient = ApplyOAuthClientCredentials(httpClient, settings)
 	httpClient = ApplyOAuthJWT(httpClient, settings)
 	httpClient = ApplyAWSAuth(httpClient, settings)
+  httpClient = ApplyAzureCredentials(httpClient, settings)
 	return &Client{
 		Settings:   settings,
 		HttpClient: httpClient,

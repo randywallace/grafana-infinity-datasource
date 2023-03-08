@@ -17,6 +17,7 @@ const authTypes: Array<SelectableValue<AuthType | 'others'>> = [
   { value: 'oauthPassThru', label: 'Forward OAuth' },
   { value: 'oauth2', label: 'OAuth2' },
   { value: 'aws', label: 'AWS' },
+  { value: 'azure', label: 'Azure' },
   { value: 'others', label: 'Other Auth Providers' },
 ];
 
@@ -39,6 +40,7 @@ export const AuthEditor = (props: DataSourcePluginOptionsEditorProps<InfinityOpt
       case 'apiKey':
       case 'bearerToken':
       case 'aws':
+      case 'azure':
       case 'oauth2':
       case 'none':
       default:

@@ -2,6 +2,7 @@ package infinity
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -13,8 +14,38 @@ import (
 	"golang.org/x/oauth2/jwt"
 
 	"github.com/yesoreyeram/grafana-infinity-datasource/pkg/models"
+
+	//"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
+type AzureTransport struct {
+  // TODO: Support different Audience
+
+	// Base is the base RoundTripper used to make HTTP requests.
+	// If nil, http.DefaultTransport is used.
+	Base http.RoundTripper
+}
+
+func (t *AzureTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+  credential, _ := azidentity.NewDefaultAzureCredential(&azidentity.DefaultAzureCredentialOptions{})
+  token, _ := credential.GetToken(context.Background(), policy.TokenRequestOptions{[]string{"https://management.azure.com/"}})
+  fmt.Printf("token: %v\n", token)
+  req.Header.Set("Authorization","Bearer "+token.Token)
+  if t.Base != nil {
+		return t.Base.RoundTrip(req)
+	}
+	return http.DefaultTransport.RoundTrip(req)
+}
+
+func ApplyAzureCredentials(httpClient *http.Client, settings models.InfinitySettings) *http.Client {
+  if settings.AuthenticationMethod == models.AuthenticationMethodAzure {
+    transport := AzureTransport{}
+    httpClient = &http.Client{Transport: &transport}
+  }
+  return httpClient
+}
 func ApplyOAuthClientCredentials(httpClient *http.Client, settings models.InfinitySettings) *http.Client {
 	if settings.AuthenticationMethod == models.AuthenticationMethodOAuth && settings.OAuth2Settings.OAuth2Type == models.AuthOAuthTypeClientCredentials {
 		oauthConfig := clientcredentials.Config{
